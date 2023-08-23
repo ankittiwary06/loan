@@ -1,6 +1,7 @@
 package com.greychain.service;
 
-import com.greychain.exception.InValidLoanException;
+
+import com.greychain.exception.InvalidLoanException;
 import com.greychain.model.Loan;
 import com.greychain.repository.LoanRepository;
 import org.junit.Test;
@@ -18,13 +19,14 @@ import java.util.*;
 @RunWith(MockitoJUnitRunner.class)
 public class LoanServiceTest {
     @InjectMocks
-    LoanService loanService= new LoanService();
+    LoanService loanService = new LoanService();
     @Mock
     LoanRepository loanRepository;
     @Mock
-    Logger logger ;
+    Logger logger;
+
     @Test
-    public void validateLoanSuccess() throws InValidLoanException {
+    public void saveLoanSuccess() throws InvalidLoanException {
         Loan loan = new Loan();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
         try {
@@ -35,27 +37,20 @@ public class LoanServiceTest {
         }
 
         loanService.saveLoan(loan);
+        Mockito.verify(loanRepository, Mockito.times(1)).save(loan);
     }
 
     @Test
-    public void saveLoanTest() throws Exception {
-        Loan loan=new Loan();
-        loan.setId("L1");
-        loanService.saveLoan(loan);
-        Optional<Loan> fetchedLoan=loanRepository.findById("L1");
-        if (fetchedLoan !=null)
-            assert loan.getId().equals(fetchedLoan.get().getId());
-    }
-    @Test
-    public void validateLoanSuccess1() throws Exception {
+    public void validateLoanSuccessWithSameDate() throws Exception {
         Loan loan = new Loan();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
         loan.setDueDate(formatter.parse("17-11-2022"));
         loan.setPaymentDate(formatter.parse("17-11-2022"));
         loanService.saveLoan(loan);
+        Mockito.verify(loanRepository, Mockito.times(1)).save(loan);
     }
 
-    @Test(expected = InValidLoanException.class)
+    @Test(expected = InvalidLoanException.class)
     public void validateLoanException() throws Exception {
         Loan loan = new Loan();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
@@ -66,10 +61,9 @@ public class LoanServiceTest {
     }
 
     @Test
-    public void checkDueDateTest()
-    {
+    public void checkDueDateTest() {
 
-        List<Loan> loans=new ArrayList<Loan>();
+        List<Loan> loans = new ArrayList<Loan>();
         Loan loan1 = new Loan();
         Loan loan2 = new Loan();
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
@@ -86,7 +80,7 @@ public class LoanServiceTest {
         loans.add(loan2);
         Mockito.when(loanRepository.findAll()).thenReturn(loans);
         loanService.checkLoanDueDate();
-        Mockito.verify(logger,Mockito.times(1)).warn("alert for loan id " + loan1.getId() + " Due date =" + loan1.getDueDate());
+        Mockito.verify(logger, Mockito.times(1)).warn("alert for loan id " + loan1.getId() + " Due date =" + loan1.getDueDate());
     }
 
 

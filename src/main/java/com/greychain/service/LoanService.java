@@ -1,5 +1,5 @@
 package com.greychain.service;
-import com.greychain.exception.InValidLoanException;
+import com.greychain.exception.InvalidLoanException;
 import com.greychain.model.Loan;
 import com.greychain.repository.LoanRepository;
 import org.slf4j.Logger;
@@ -15,21 +15,12 @@ public class LoanService {
     LoanRepository loanRepository;
     Logger logger = LoggerFactory.getLogger(LoanService.class);
 
-    public void validateLoan(Loan loan) throws InValidLoanException {
-        if (loan.getPaymentDate().after(loan.getDueDate())) {
-            {
-                logger.error("Invalid loan Exception");
-                throw new InValidLoanException();
-            }
 
-        }
-    }
-
-    public  void saveLoan(Loan loan) throws InValidLoanException {
+    public  void saveLoan(Loan loan) throws InvalidLoanException {
         try {
             validateLoan(loan);
             loanRepository.save(loan);
-        } catch (InValidLoanException e) {
+        } catch (InvalidLoanException e) {
             logger.error(e.getMessage());
             throw e;
 
@@ -45,7 +36,6 @@ public class LoanService {
     public void checkLoanDueDate() {
 
         List<Loan> loans=loanRepository.findAll();
-        Date todayDate=new Date();
         for (Loan item : loans) {
 
 
@@ -57,11 +47,21 @@ public class LoanService {
 
     }
 
-    public  void getAggregateRemainingAmount() {
-        loanRepository.aggregation();
+    public  List<Object> getAggregateRemainingAmount() {
+      return loanRepository.remainingAmountTotalByCustomerLenderInterest();
+
     }
 
 
 
+    private  void validateLoan(Loan loan) throws InvalidLoanException {
+        if (loan.getPaymentDate().after(loan.getDueDate())) {
+            {
+                logger.error("Invalid loan Exception : payment date is after due date");
+                throw new InvalidLoanException("Invalid loan Exception : payment date is after due date");
+            }
+
+        }
+    }
 
 }

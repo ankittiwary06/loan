@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class Lender implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     Integer id;
     String lenderId;
     String lenderName;

@@ -16,7 +16,7 @@ import java.util.Date;
 public class Loan  implements Serializable {
 
        @Id
-       @GeneratedValue(strategy = GenerationType.IDENTITY)
+       @GeneratedValue(strategy = GenerationType.AUTO)
        private Integer id;
        @Column
        String loanId;
@@ -36,9 +36,9 @@ public class Loan  implements Serializable {
        private Double penalty;
        @Column
        private boolean cancel;
-       @Column
+       @OneToOne
        private Customer customer;
-       @Column
+       @OneToOne
        private Lender lender;
 
 }
